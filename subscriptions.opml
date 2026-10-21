@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0"><head><title>Reading Feed Subscriptions</title></head><body>
+<outline text="Discovery" title="Discovery">
+<outline type="rss" text="Hacker News" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/"/>
+<outline type="rss" text="Show HN" xmlUrl="https://hnrss.org/show" htmlUrl="https://news.ycombinator.com/show"/>
+<outline type="rss" text="Lobsters" xmlUrl="https://lobste.rs/rss" htmlUrl="https://lobste.rs/"/>
+<outline type="rss" text="Simon Willison" xmlUrl="https://simonwillison.net/atom/entries/" htmlUrl="https://simonwillison.net/"/>
+</outline>
+<outline text="Curated" title="Curated">
+<outline type="rss" text="Reading Feed - All" xmlUrl="https://yunskim.github.io/reading-feed/all.xml"/>
+<outline type="rss" text="Reading Feed - Magnolia" xmlUrl="https://yunskim.github.io/reading-feed/magnolia.xml"/>
+<outline type="rss" text="Reading Feed - RustJ" xmlUrl="https://yunskim.github.io/reading-feed/rustj.xml"/>
+<outline type="rss" text="Reading Feed - Lexical" xmlUrl="https://yunskim.github.io/reading-feed/lexical.xml"/>
+</outline>
+</body></opml>
