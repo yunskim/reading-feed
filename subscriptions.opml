@@ -9,6 +9,7 @@
 <outline text="Curated" title="Curated">
 <outline type="rss" text="Reading Feed - All" xmlUrl="https://yunskim.github.io/reading-feed/all.xml"/>
 <outline type="rss" text="Reading Feed - Magnolia" xmlUrl="https://yunskim.github.io/reading-feed/magnolia.xml"/>
+<outline type="rss" text="Reading Feed - Array Compilers" xmlUrl="https://yunskim.github.io/reading-feed/array-compilers.xml"/>
 <outline type="rss" text="Reading Feed - RustJ" xmlUrl="https://yunskim.github.io/reading-feed/rustj.xml"/>
 <outline type="rss" text="Reading Feed - Lexical" xmlUrl="https://yunskim.github.io/reading-feed/lexical.xml"/>
 </outline>
