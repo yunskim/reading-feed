@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Local-first software: You own your data, in spite of the cloud",
+    "url": "https://www.inkandswitch.com/essay/local-first/",
+    "projects": [
+      "magnolia"
+    ],
+    "summary": "로컬 소유권과 협업의 양립을 검토하는 기초 연구",
+    "insight": "Magnolia의 서버 역할, 복제와 동기화 경계를 재검토",
+    "added": "2026-10-21"
+  },
+  {
+    "title": "Peritext: A CRDT for Rich-Text Collaboration",
+    "url": "https://www.inkandswitch.com/peritext/",
+    "projects": [
+      "lexical"
+    ],
+    "summary": "리치 텍스트 서식과 동시 편집의 의미 보존",
+    "insight": "Lexical 문서 구조와 변경 의미의 분리 검토",
+    "added": "2026-10-21"
+  },
+  {
+    "title": "Egg: Fast and Extensible Equality Saturation",
+    "url": "https://egraphs-good.github.io/",
+    "projects": [
+      "rustj"
+    ],
+    "summary": "E-graph 기반 등가식 탐색과 최적화",
+    "insight": "RustJ의 graph IR 및 logical IR 재작성 경계 검토",
+    "added": "2026-10-21"
+  }
+]
