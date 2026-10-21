@@ -9,7 +9,7 @@ from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://yunskim.github.io/reading-feed"
-PROJECTS = {"magnolia": "Magnolia Works", "rustj": "RustJ", "lexical": "lexical-tufte-css"}
+PROJECTS = {"magnolia": "Magnolia Works", "rustj": "RustJ", "array-compilers": "Array Compilers", "lexical": "lexical-tufte-css"}
 
 def normalized(url):
     parts = urlsplit(url.strip())
