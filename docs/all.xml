@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel><title>Reading Feed — All Projects</title><link>https://yunskim.github.io/reading-feed/</link><description>Selected reading for thoughtful software design</description><language>ko</language><item><title>Local-first software: You own your data, in spite of the cloud</title><link>https://www.inkandswitch.com/essay/local-first/</link><guid isPermaLink="false">https://www.inkandswitch.com/essay/local-first</guid><description>로컬 소유권과 협업의 양립을 검토하는 기초 연구
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0"><channel><title>Reading Feed — All Projects</title><link>https://yunskim.github.io/reading-feed/</link><description>Selected reading for thoughtful software design</description><language>ko</language><item><title>Peritext: A CRDT for Rich-Text Collaboration</title><link>https://www.inkandswitch.com/peritext/</link><guid isPermaLink="false">https://www.inkandswitch.com/peritext</guid><description>리치 텍스트 서식과 동시 편집의 의미 보존
 
-설계 시사점: Magnolia의 서버 역할, 복제와 동기화 경계를 재검토</description><pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate></item><item><title>Peritext: A CRDT for Rich-Text Collaboration</title><link>https://www.inkandswitch.com/peritext/</link><guid isPermaLink="false">https://www.inkandswitch.com/peritext</guid><description>리치 텍스트 서식과 동시 편집의 의미 보존
+설계 시사점: Lexical 문서 구조와 변경 의미의 분리 검토</description><pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate></item><item><title>Local-first software: You own your data, in spite of the cloud</title><link>https://www.inkandswitch.com/essay/local-first/</link><guid isPermaLink="false">https://www.inkandswitch.com/essay/local-first</guid><description>로컬 소유권과 협업의 양립을 검토하는 기초 연구
 
-설계 시사점: Lexical 문서 구조와 변경 의미의 분리 검토</description><pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate></item><item><title>Egg: Fast and Extensible Equality Saturation</title><link>https://egraphs-good.github.io/</link><guid isPermaLink="false">https://egraphs-good.github.io</guid><description>E-graph 기반 등가식 탐색과 최적화
+설계 시사점: Magnolia의 서버 역할, 복제와 동기화 경계를 재검토</description><pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate></item><item><title>Egg: Fast and Extensible Equality Saturation</title><link>https://egraphs-good.github.io/</link><guid isPermaLink="false">https://egraphs-good.github.io/</guid><description>E-graph 기반 등가식 탐색과 최적화
 
 설계 시사점: RustJ의 graph IR 및 logical IR 재작성 경계 검토</description><pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate></item></channel></rss>
