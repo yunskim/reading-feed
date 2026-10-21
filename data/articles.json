@@ -23,7 +23,8 @@
     "title": "Egg: Fast and Extensible Equality Saturation",
     "url": "https://egraphs-good.github.io/",
     "projects": [
-      "rustj"
+      "rustj",
+      "array-compilers"
     ],
     "summary": "E-graph 기반 등가식 탐색과 최적화",
     "insight": "RustJ의 graph IR 및 logical IR 재작성 경계 검토",
