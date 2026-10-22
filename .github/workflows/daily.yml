@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Test discovery logic
+        run: python -m unittest discover -s tests
       - name: Discover and rank articles
         run: python scripts/discover.py
       - name: Build and validate RSS
