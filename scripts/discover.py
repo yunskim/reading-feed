@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Daily topic-specific discovery from public Hacker News search, no API key."""
 import json
+import html
 import os
 import re
 import sys
@@ -112,72 +113,116 @@ def discover(existing, now, fetcher=fetch):
     return added
 
 REDDIT_SEARCHES = [
-    ("Buddhism", "antidepressants"),
-    ("Buddhism", "SSRI"),
-    ("secularbuddhism", "antidepressants"),
-    ("lexapro", "identity"),
-    ("lexapro", "self"),
+    (subreddit, query)
+    for subreddit in ("Buddhism", "secularbuddhism", "lexapro")
+    for query in ("SSRI OR antidepressant OR antidepressants OR lexapro OR escitalopram",
+                  'identity OR personality OR anatta OR "no self" OR "sense of self"')
 ]
-SELF_TERMS = ("self", "identity", "personality", "anatta", "anātman", "no-self", "sense of self", "who am i", "ego", "자아", "무아")
-MED_TERMS = ("ssri", "lexapro", "antidepressant", "medication", "prozac", "escitalopram", "약물", "항우울제")
-SPIRIT_TERMS = ("buddhism", "buddhist", "meditation", "dharma", "anatta", "no-self", "mindfulness", "불교", "명상")
+SELF_TERMS = ("self", "myself", "identity", "personality", "anatta", "anātman", "anatman", "no-self", "who am i", "ego", "자아", "무아")
+MED_TERMS = ("ssri", "ssris", "lexapro", "antidepressant", "antidepressants", "prozac", "escitalopram", "sertraline", "zoloft", "약물", "항우울제")
+ATOM = {"a": "http://www.w3.org/2005/Atom"}
 
-def discover_reddit(existing, now):
-    """Search Reddit RSS; require identity plus medication or Buddhist practice."""
-    from datetime import datetime as dt
-    known = {normalize(x["url"]) for x in existing}
-    added, failures = [], 0
-    for subreddit, query in REDDIT_SEARCHES:
-        url = "https://www.reddit.com/r/" + subreddit + "/search.rss?" + urlencode(
-            {"q": query, "restrict_sr": "1", "sort": "new", "t": "week"})
+
+def reddit_key(url):
+    """Canonical post identity, independent of host, title slug or tracking query."""
+    p = urlsplit(url.strip())
+    if p.scheme not in ("https", "http"):
+        raise ValueError("Invalid Reddit URL")
+    if p.hostname == "redd.it":
+        post_id = p.path.strip("/")
+    elif p.hostname in ("reddit.com", "www.reddit.com", "old.reddit.com", "new.reddit.com", "np.reddit.com"):
+        m = re.fullmatch(r"/r/[^/]+/comments/([a-z0-9]+)(?:/[^/]*)?/?", p.path, re.I)
+        if not m:
+            raise ValueError("Not a Reddit post")
+        post_id = m.group(1)
+    else:
+        raise ValueError("Not Reddit")
+    if not re.fullmatch(r"[a-z0-9]+", post_id, re.I):
+        raise ValueError("Invalid post ID")
+    return "https://www.reddit.com/comments/" + post_id.lower()
+
+
+def fetch_reddit(subreddit, query):
+    url = "https://www.reddit.com/r/" + subreddit + "/search.rss?" + urlencode(
+        {"q": query, "restrict_sr": "1", "sort": "new", "t": "week", "limit": 100})
+    req = Request(url, headers={"User-Agent": USER_AGENT})
+    with urlopen(req, timeout=20) as response:
+        root = ElementTree.fromstring(response.read())
+    if root.tag != "{http://www.w3.org/2005/Atom}feed":
+        raise ValueError("Expected Reddit Atom feed")
+    return root
+
+
+def discover_reddit(existing, now, fetcher=fetch_reddit):
+    """Require medication AND identity in title/body; never infer medication from subreddit."""
+    known = set()
+    for article in existing:
         try:
-            req = Request(url, headers={"User-Agent": "reading-feed/1.0 (RSS topic discovery)"})
-            with urlopen(req, timeout=20) as response:
-                root = ElementTree.fromstring(response.read())
+            known.add(reddit_key(article["url"]))
+        except ValueError:
+            pass
+    candidates, successes = {}, 0
+    for subreddit, query in REDDIT_SEARCHES:
+        try:
+            root = fetcher(subreddit, query)
+            if root.tag != "{http://www.w3.org/2005/Atom}feed":
+                raise ValueError("Expected Reddit Atom feed")
+            successes += 1
         except Exception as exc:
-            failures += 1
             print(f"Reddit RSS failed: {subreddit}/{query}: {exc}", file=sys.stderr)
             continue
-        ns = {"a": "http://www.w3.org/2005/Atom"}
-        for entry in root.findall("a:entry", ns):
-            title = (entry.findtext("a:title", default="", namespaces=ns) or "").strip()
-            link = entry.find("a:link", ns)
-            href = link.get("href", "") if link is not None else ""
-            published = entry.findtext("a:updated", default="", namespaces=ns)
-            if not title or not href:
-                continue
+        for entry in root.findall("a:entry", ATOM):
+            title = entry.findtext("a:title", default="", namespaces=ATOM).strip()
+            links = [x for x in entry.findall("a:link", ATOM) if x.get("rel", "alternate") == "alternate"]
+            href = links[0].get("href", "") if links else ""
+            # published is the creation date; updated may reflect an edit to an old post.
+            published = entry.findtext("a:published", namespaces=ATOM)
+            if published is None:
+                published = entry.findtext("a:updated", default="", namespaces=ATOM)
             try:
-                if published and dt.fromisoformat(published.replace("Z", "+00:00")) < now - timedelta(days=8):
+                date = datetime.fromisoformat(published.replace("Z", "+00:00"))
+                if date.tzinfo is None or not now - timedelta(days=8) <= date <= now:
                     continue
-                key = normalize(href)
-            except ValueError:
+                date = date.astimezone(timezone.utc)
+                key = reddit_key(href)
+                path = urlsplit(href).path
+                if not re.match(r"/r/" + re.escape(subreddit) + r"/comments/", path, re.I):
+                    continue
+            except (ValueError, TypeError):
                 continue
-            if key in known:
+            if not title or key in known:
                 continue
-            lower = title.lower()
-            if not any(t in lower for t in SELF_TERMS):
+            content = entry.findtext("a:content", default="", namespaces=ATOM)
+            text = title + " " + html.unescape(re.sub(r"<[^>]*>", " ", content))
+            if not match(text, SELF_TERMS) or not match(text, MED_TERMS):
                 continue
-            if not (any(t in lower for t in MED_TERMS) or
-                    (subreddit in ("Buddhism", "secularbuddhism") and any(t in lower for t in SPIRIT_TERMS))):
-                continue
-            known.add(key)
-            added.append({
-                "title": title, "url": href, "projects": ["ssri-anatta"],
+            # Discard tracking parameters and fragments from emitted links too.
+            clean = urlunsplit(("https", "www.reddit.com", path.rstrip("/") + "/", "", ""))
+            candidates.setdefault(key, {
+                "title": title, "url": clean, "projects": ["ssri-anatta"],
                 "summary": "Reddit r/" + subreddit + "의 관련 토론. 게시글의 주장은 검증되지 않았으며 원문 확인 필요.",
                 "insight": "항우울제·자아감 변화·불교의 무아와 수행의 관계를 살펴볼 사례. 의학적 근거로 취급하지 말 것.",
-                "added": now.date().isoformat(),
+                "published": date.isoformat(), "added": now.date().isoformat(),
             })
-            if len(added) >= 5:
-                return added
-    if failures == len(REDDIT_SEARCHES):
-        print("All Reddit feeds unavailable; existing entries preserved", file=sys.stderr)
+    if not successes:
+        raise RuntimeError("All Reddit feeds unavailable; existing entries preserved")
+    added = sorted(candidates.values(), key=lambda x: (x["published"], x["url"]), reverse=True)[:5]
+    print(f"Reddit RSS: {successes}/{len(REDDIT_SEARCHES)} searches succeeded; {len(added)} new posts")
     return added
+
 
 def main():
     now = datetime.now(timezone.utc)
     existing = json.loads(DATA.read_text(encoding="utf-8"))
-    additions = discover(existing, now)
-    additions += discover_reddit(existing + additions, now)
+    additions, failures = [], []
+    for source in (discover, discover_reddit):
+        try:
+            additions.extend(source(existing + additions, now))
+        except RuntimeError as exc:
+            failures.append(str(exc))
+            print(f"::warning::{exc}", file=sys.stderr)
+    if len(failures) == 2:
+        raise RuntimeError("All sources failed; preserve existing data and feeds")
     if additions:
         DATA.write_text(json.dumps(existing + additions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Added {len(additions)} articles")

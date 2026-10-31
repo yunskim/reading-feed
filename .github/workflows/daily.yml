@@ -1,5 +1,11 @@
 name: Daily Reading Discovery
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/discover.py'
+      - 'tests/**'
+      - '.github/workflows/daily.yml'
   schedule:
     - cron: '15 0 * * *' # 09:15 Asia/Seoul
   workflow_dispatch:
