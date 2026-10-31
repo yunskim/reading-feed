@@ -254,5 +254,36 @@
     "insight": "항우울제·자아감 변화·불교의 무아와 수행의 관계를 살펴볼 사례. 의학적 근거로 취급하지 말 것.",
     "published": "2026-10-29T14:47:47+00:00",
     "added": "2026-10-31"
+  },
+  {
+    "title": "Antidepressants May Change Personality, Leading to Reduced Depression, Says Penn Collaboration",
+    "url": "https://penntoday.upenn.edu/news/antidepressants-may-change-personality-leading-reduced-depression-says-penn-collaboration",
+    "summary": "UPenn의 2009년 연구 소개. 파록세틴 치료 중 관찰된 신경증적 경향과 외향성의 변화를 우울 증상 개선과 구분해 검토한다.",
+    "insight": "약물 치료 중 성격 변화라는 질문에 연결되는 연구 소개. 파록세틴 연구 결과를 모든 SSRI나 개인의 경험에 그대로 일반화하지 않고 원 연구와 함께 읽기.",
+    "published": "2009-12-14",
+    "projects": [
+      "ssri-anatta"
+    ],
+    "added": "2026-10-31"
+  },
+  {
+    "title": "Prozac & Enlightened Mind",
+    "url": "https://tricycle.org/magazine/prozac-enlightened-mind/",
+    "summary": "Judith Hooper의 1999년 Tricycle 기사. 항우울제와 불교 수행의 관계, 약으로 변화하는 자아감에 대한 수행자와 임상가의 견해를 소개한다.",
+    "insight": "약을 복용하는 자아와 명상하는 자아에 관한 질문을 살펴볼 읽을거리. 과거의 인터뷰·논평으로서 임상 연구나 현재의 치료 지침과 구분해 읽기.",
+    "projects": [
+      "ssri-anatta"
+    ],
+    "added": "2026-10-31"
+  },
+  {
+    "title": "Should the Buddha have taken Prozac?",
+    "url": "https://sources.mandala.library.virginia.edu/node/128368",
+    "summary": "이전에 소개한 SSRI와 종교적 질문에 관한 글의 University of Virginia Mandala 서지 링크. 추가 시점에 서버가 HTTP 403을 반환하여 원문과 서지 상세를 직접 확인하지 못했다.",
+    "insight": "항우울제·자아 정체성·불교의 관계를 검토하기 위한 참고 링크. 원문 접근 후 논지와 출처를 확인할 것.",
+    "projects": [
+      "ssri-anatta"
+    ],
+    "added": "2026-10-31"
   }
 ]
