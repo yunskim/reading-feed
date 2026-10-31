@@ -7,6 +7,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit, urlunsplit
+from xml.etree import ElementTree
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,10 +111,73 @@ def discover(existing, now, fetcher=fetch):
         })
     return added
 
+REDDIT_SEARCHES = [
+    ("Buddhism", "antidepressants"),
+    ("Buddhism", "SSRI"),
+    ("secularbuddhism", "antidepressants"),
+    ("lexapro", "identity"),
+    ("lexapro", "self"),
+]
+SELF_TERMS = ("self", "identity", "personality", "anatta", "anātman", "no-self", "sense of self", "who am i", "ego", "자아", "무아")
+MED_TERMS = ("ssri", "lexapro", "antidepressant", "medication", "prozac", "escitalopram", "약물", "항우울제")
+SPIRIT_TERMS = ("buddhism", "buddhist", "meditation", "dharma", "anatta", "no-self", "mindfulness", "불교", "명상")
+
+def discover_reddit(existing, now):
+    """Search Reddit RSS; require identity plus medication or Buddhist practice."""
+    from datetime import datetime as dt
+    known = {normalize(x["url"]) for x in existing}
+    added, failures = [], 0
+    for subreddit, query in REDDIT_SEARCHES:
+        url = "https://www.reddit.com/r/" + subreddit + "/search.rss?" + urlencode(
+            {"q": query, "restrict_sr": "1", "sort": "new", "t": "week"})
+        try:
+            req = Request(url, headers={"User-Agent": "reading-feed/1.0 (RSS topic discovery)"})
+            with urlopen(req, timeout=20) as response:
+                root = ElementTree.fromstring(response.read())
+        except Exception as exc:
+            failures += 1
+            print(f"Reddit RSS failed: {subreddit}/{query}: {exc}", file=sys.stderr)
+            continue
+        ns = {"a": "http://www.w3.org/2005/Atom"}
+        for entry in root.findall("a:entry", ns):
+            title = (entry.findtext("a:title", default="", namespaces=ns) or "").strip()
+            link = entry.find("a:link", ns)
+            href = link.get("href", "") if link is not None else ""
+            published = entry.findtext("a:updated", default="", namespaces=ns)
+            if not title or not href:
+                continue
+            try:
+                if published and dt.fromisoformat(published.replace("Z", "+00:00")) < now - timedelta(days=8):
+                    continue
+                key = normalize(href)
+            except ValueError:
+                continue
+            if key in known:
+                continue
+            lower = title.lower()
+            if not any(t in lower for t in SELF_TERMS):
+                continue
+            if not (any(t in lower for t in MED_TERMS) or
+                    (subreddit in ("Buddhism", "secularbuddhism") and any(t in lower for t in SPIRIT_TERMS))):
+                continue
+            known.add(key)
+            added.append({
+                "title": title, "url": href, "projects": ["ssri-anatta"],
+                "summary": "Reddit r/" + subreddit + "의 관련 토론. 게시글의 주장은 검증되지 않았으며 원문 확인 필요.",
+                "insight": "항우울제·자아감 변화·불교의 무아와 수행의 관계를 살펴볼 사례. 의학적 근거로 취급하지 말 것.",
+                "added": now.date().isoformat(),
+            })
+            if len(added) >= 5:
+                return added
+    if failures == len(REDDIT_SEARCHES):
+        print("All Reddit feeds unavailable; existing entries preserved", file=sys.stderr)
+    return added
+
 def main():
     now = datetime.now(timezone.utc)
     existing = json.loads(DATA.read_text(encoding="utf-8"))
     additions = discover(existing, now)
+    additions += discover_reddit(existing + additions, now)
     if additions:
         DATA.write_text(json.dumps(existing + additions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Added {len(additions)} articles")
