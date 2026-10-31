@@ -9,7 +9,7 @@ from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://yunskim.github.io/reading-feed"
-PROJECTS = {"magnolia": "Magnolia Works", "rustj": "RustJ", "array-compilers": "Array Compilers", "lexical": "lexical-tufte-css"}
+PROJECTS = {"magnolia": "Magnolia Works", "rustj": "RustJ", "array-compilers": "Array Compilers", "lexical": "lexical-tufte-css", "ssri-anatta": "SSRI, Identity & Anatta"}
 
 def normalized(url):
     parts = urlsplit(url.strip())
@@ -26,7 +26,10 @@ def write_feed(path, title, entries):
         item = SubElement(channel, "item")
         for tag, value in (("title", article["title"]), ("link", article["url"]), ("guid", normalized(article["url"])), ("description", article["summary"] + "\n\n설계 시사점: " + article["insight"])):
             SubElement(item, tag, {"isPermaLink": "false"} if tag == "guid" else {}).text = value
-        dt = datetime.fromisoformat(article["added"]).replace(tzinfo=timezone.utc)
+        dt = datetime.fromisoformat(article.get("published", article["added"]))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        dt = dt.astimezone(timezone.utc)
         SubElement(item, "pubDate").text = format_datetime(dt)
     path.parent.mkdir(parents=True, exist_ok=True)
     ElementTree(rss).write(path, encoding="utf-8", xml_declaration=True)
