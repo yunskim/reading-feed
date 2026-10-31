@@ -10,6 +10,7 @@ Import [subscriptions.opml](subscriptions.opml) into NetNewsWire. Select either 
 - https://yunskim.github.io/reading-feed/rustj.xml
 - https://yunskim.github.io/reading-feed/array-compilers.xml
 - https://yunskim.github.io/reading-feed/lexical.xml
+- https://yunskim.github.io/reading-feed/ssri-anatta.xml
 
 ## Publishing
 Enable **Settings → Pages → Deploy from a branch → main → /docs**.
@@ -24,3 +25,7 @@ Edit `data/articles.json` (title, URL, projects, summary, insight, date; project
 **Editorial limitation:** this is deterministic keyword/engagement-based discovery, *not* an AI reading or evaluation of full articles. Auto-generated summaries explicitly say that the original needs review. Treat design implications as prompts for investigation, not verified conclusions. Manual entries can still be added to `data/articles.json`.
 
 The workflow commits new entries and regenerated `docs/*.xml` to main; GitHub Pages publishes the resulting feeds. Failed external searches are reported; if every search fails, the workflow fails without overwriting the existing feed. Run `python -m unittest discover -s tests` to test discovery logic.
+
+## SSRI, identity and anatta
+
+The separate `ssri-anatta.xml` feed discovers Reddit discussions on antidepressants, changing sense of self, and Buddhist no-self. Search sources include r/Buddhism, r/secularbuddhism and r/lexapro. Titles must match identity-related terms and medication or Buddhist-practice context. The script caps additions at five per run, deduplicates URLs and preserves existing articles when Reddit RSS is unavailable. These are unverified personal accounts, not medical advice. Reddit may rate-limit or block automated requests.
